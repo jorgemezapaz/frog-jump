@@ -1,0 +1,13 @@
+[gd_scene load_steps=3 format=3 uid="uid://33aolm7rxplv"]
+
+[ext_resource type="Script" path="res://scripts/camera/camera_zone_2d.gd" id="1_e17hs"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_1c2f0"]
+size = Vector2(640, 360)
+
+[node name="CameraZone2D" type="Area2D"]
+script = ExtResource("1_e17hs")
+
+[node name="Zone" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_1c2f0")
+debug_color = Color(0.86186, 0.000639369, 0.871022, 0.42)

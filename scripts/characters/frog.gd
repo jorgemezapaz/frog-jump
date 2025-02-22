@@ -43,7 +43,7 @@ func apply_gravity(delta:float) -> void:
 
 func reduce_sliding_on_ground() -> void:
 	if is_on_floor() and !is_charging:
-		velocity.x = lerp(float(velocity.x), 0.0, 0.1) 
+		velocity.x = lerp(float(velocity.x), 0.0, 0.1)
 
 func direction_handler() -> void:
 	if Input.is_action_pressed("right"):
@@ -56,6 +56,7 @@ func direction_handler() -> void:
 func jump_handler(delta:float) -> void:
 	if Input.is_action_pressed("jump") and is_on_floor():
 		is_charging = true
+		velocity.x = 0
 		charge_timer+= charge_speed * (delta/10)
 		charge_timer = min(charge_timer, 1.0)
 		if charge_timer == 1:
