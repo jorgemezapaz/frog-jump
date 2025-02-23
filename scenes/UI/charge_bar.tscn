@@ -1,0 +1,11 @@
+[gd_scene load_steps=3 format=3 uid="uid://c1mu6i78ywnov"]
+
+[ext_resource type="Script" path="res://scripts/ui/charge_bar.gd" id="1_ewdwa"]
+[ext_resource type="Texture2D" uid="uid://bhp1tnva8d0lm" path="res://assets/ui/charge_bar.png" id="2_akddy"]
+
+[node name="charge_bar" type="Node2D"]
+script = ExtResource("1_ewdwa")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("2_akddy")
+hframes = 15

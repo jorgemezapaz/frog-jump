@@ -7,7 +7,7 @@ extends CharacterBody2D
 @export var min_horizontal_force: float = 50  # Fuerza horizontal mínima (para saltos cortos)
 @export var wall_bounce_force: float = 200  # Fuerza del rebote contra paredes
 
-@onready var progress_bar: ProgressBar = $ProgressBar
+@onready var progress_bar: Node2D = $charge_bar
 @onready var animation_player: AnimationPlayer = $AnimationPlayer
 @onready var sprite: Sprite2D = $Sprite2D
 
@@ -81,7 +81,7 @@ func bounce_handler()->void:
 			velocity.x = (wall_bounce_force * last_charge_timer ) * sign(normal.x)  # Rebota en la dirección opuesta
 
 func progress_bar_handler()->void:
-	progress_bar.value = charge_timer * 100
+	progress_bar.update_value(charge_timer * 100)
 
 func animation_handler()->void:
 	if is_on_floor():
