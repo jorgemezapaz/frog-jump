@@ -4,6 +4,7 @@
 [ext_resource type="Texture2D" uid="uid://bhp1tnva8d0lm" path="res://assets/ui/charge_bar.png" id="2_akddy"]
 
 [node name="charge_bar" type="Node2D"]
+visible = false
 script = ExtResource("1_ewdwa")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]

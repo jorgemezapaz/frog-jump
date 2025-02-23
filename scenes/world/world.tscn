@@ -1,10 +1,13 @@
-[gd_scene load_steps=4 format=4 uid="uid://if2fdlv6m5j8"]
+[gd_scene load_steps=5 format=4 uid="uid://if2fdlv6m5j8"]
 
+[ext_resource type="PackedScene" uid="uid://hntblhpukc14" path="res://scenes/UI/ui.tscn" id="1_xssof"]
 [ext_resource type="PackedScene" uid="uid://1gjpide404st" path="res://scenes/characters/frog.tscn" id="2_5m030"]
 [ext_resource type="TileSet" uid="uid://bicbaevjp1jox" path="res://assets/tileset/world1.tres" id="2_yip3l"]
 [ext_resource type="PackedScene" uid="uid://33aolm7rxplv" path="res://scenes/camera/camera_zone_2d.tscn" id="3_lxiko"]
 
 [node name="world" type="Node2D"]
+
+[node name="UI" parent="." instance=ExtResource("1_xssof")]
 
 [node name="frog" parent="." instance=ExtResource("2_5m030")]
 position = Vector2(527, 420)
