@@ -1,11 +1,14 @@
 extends CharacterBody2D
 
-@export var jump_force: float = 800  # Fuerza máxima de salto
+@export var jump_force: float = 700  # Fuerza máxima de salto
 @export var gravity: float = 1200  # Simula la gravedad
 @export var charge_speed: float = 5.0  # Velocidad con la que se llena la barra de carga
 @export var max_horizontal_force: float = 300  # Máxima fuerza horizontal
 @export var min_horizontal_force: float = 50  # Fuerza horizontal mínima (para saltos cortos)
 @export var wall_bounce_force: float = 200  # Fuerza del rebote contra paredes
+@export var slide_force: float = 200  # Fuerza de deslizamiento
+@export var max_slide_speed: float = 300  # Velocidad máxima de deslizamiento
+@export var wall_friction: float = 0.8  # Fricción en las paredes
 
 @onready var charge_bar: Node2D = $charge_bar
 @onready var animation_player: AnimationPlayer = $AnimationPlayer
@@ -13,7 +16,8 @@ extends CharacterBody2D
 @onready var sfx: AudioStreamPlayer2D = $sfx
 @onready var jump_sfx: AudioStream = preload("res://assets/sfx/jump.wav")
 @onready var bounce_sfx: AudioStream = preload("res://assets/sfx/hitHurt.wav")
-
+@onready var fell_sfx: AudioStream = preload("res://assets/sfx/fell.wav")
+@onready var fell_animetion_timer:Timer = $timers/fell_animation_timer
 
 var charge_timer: float = 0.0
 var last_charge_timer: float = 0.0
@@ -27,7 +31,7 @@ const FRONT: int = 0
 var is_falling: bool = false
 var fall_start_y: float = 0.0
 var fall_distance_threshold: float = 300.0  # Distancia mínima para considerar una caída real
-
+var fell_animation = false
 
 func _physics_process(delta: float) -> void:
 	# Aplicar gravedad
@@ -42,20 +46,10 @@ func _physics_process(delta: float) -> void:
 	bounce_handler()
 	# Manejar animaciones
 	animation_handler()
-	
-	# Detectar el inicio de una caída real
-	if velocity.y > 0 and not is_on_floor() and not is_falling:
-		is_falling = true
-		fall_start_y = global_position.y  # Guardar la posición desde donde empieza a caer
-
-	# Detectar si aterriza después de caer
-	if is_on_floor() and is_falling:
-		var fall_distance = global_position.y - fall_start_y
-		print(fall_distance)
-		if fall_distance > fall_distance_threshold:
-			GlobalSignal.player_fell.emit()
-		is_falling = false  # Reiniciar estado de caída
-	
+	# Detecta si es una caída
+	fell_handler()
+	# Maneja el deslizamiento en las pendientes
+	slide_on_slope(delta)
 	move_and_slide()
 
 func apply_gravity(delta:float) -> void:
@@ -78,15 +72,12 @@ func jump_handler(delta:float) -> void:
 	if Input.is_action_pressed("jump") and is_on_floor():
 		is_charging = true
 		velocity.x = 0
-		if charge_timer < 0.5:
-			charge_timer+= charge_speed * (delta/10)
-		else:
-			charge_timer+= charge_speed * (delta/6)
+		charge_timer+= charge_speed * (delta/7)
 		charge_timer = min(charge_timer, 1.0)
 		if charge_timer == 1:
-			charge_timer = 0
+			charge_timer = 1
 		# Actualizar la barra de carga del salto
-		progress_bar_handler(true)
+		#progress_bar_handler(true)
 	elif Input.is_action_just_released("jump") and is_charging:
 		var jump_strength = lerp(200.0, jump_force, charge_timer)
 		var horizontal_force = lerp(min_horizontal_force, max_horizontal_force, charge_timer)
@@ -100,7 +91,7 @@ func jump_handler(delta:float) -> void:
 		is_charging = false
 		charge_timer = 0.0
 		# Actualizar la barra de carga del salto
-		progress_bar_handler(false)
+		#progress_bar_handler(false)
 
 func bounce_handler()->void:
 	for i in range(get_slide_collision_count()):
@@ -118,14 +109,26 @@ func progress_bar_handler(is_visible: bool)->void:
 
 func animation_handler()->void:
 	if is_on_floor():
-		if FRONT == direction:
-			animation_player.play("idle")
-		elif RIGHT == direction:
-			animation_player.play("idle_side")
-			sprite.flip_h = true
-		elif LEFT == direction:
-			animation_player.play("idle_side")
-			sprite.flip_h = false
+		if is_charging:
+			if FRONT == direction:
+				animation_player.play("charge_front")
+			elif RIGHT == direction:
+				animation_player.play("charge_side")
+				sprite.flip_h = true
+			elif LEFT == direction:
+				animation_player.play("charge_side")
+				sprite.flip_h = false
+		elif fell_animation:
+			animation_player.play("fell")
+		else:
+			if FRONT == direction:
+				animation_player.play("idle")
+			elif RIGHT == direction:
+				animation_player.play("idle_side")
+				sprite.flip_h = true
+			elif LEFT == direction:
+				animation_player.play("idle_side")
+				sprite.flip_h = false
 	else:
 		if FRONT == direction:
 			if velocity.y < 0:
@@ -140,3 +143,33 @@ func animation_handler()->void:
 func play_sfx(sfx_sound:AudioStream):
 	sfx.stream = sfx_sound
 	sfx.play()
+
+func _on_fell_animation_timer_timeout() -> void:
+	fell_animation = false
+
+func fell_handler():
+	# Detectar el inicio de una caída real
+	if velocity.y > 0 and not is_on_floor() and not is_falling:
+		is_falling = true
+		fall_start_y = global_position.y  # Guardar la posición desde donde empieza a caer
+
+	# Detectar si aterriza después de caer
+	if is_on_floor() and is_falling:
+		var fall_distance = global_position.y - fall_start_y
+		if fall_distance > fall_distance_threshold:
+			GlobalSignal.player_fell.emit()
+			fell_animation = true
+			play_sfx(fell_sfx)
+			fell_animetion_timer.start()
+		is_falling = false  # Reiniciar estado de caída
+
+func slide_on_slope(delta):
+	for i in range(get_slide_collision_count()):
+		var collision = get_slide_collision(i)
+		var normal = collision.get_normal()
+
+		# Detectar inclinación (pendientes)
+		if is_on_wall() and abs(normal.x) > 0.1 and abs(normal.y) < 0.9:
+			# Deslizar hacia abajo en función de la inclinación
+			velocity += normal.rotated(-PI / 2) * slide_force * delta
+			#velocity = velocity.clamped(max_slide_speed)  # Limitar la velocidad máxima

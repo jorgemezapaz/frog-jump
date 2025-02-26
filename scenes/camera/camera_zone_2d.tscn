@@ -6,6 +6,7 @@
 size = Vector2(640, 360)
 
 [node name="CameraZone2D" type="Area2D"]
+z_index = 1
 script = ExtResource("1_e17hs")
 
 [node name="Zone" type="CollisionShape2D" parent="."]
