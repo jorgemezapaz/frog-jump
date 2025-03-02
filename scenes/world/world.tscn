@@ -1,14 +1,10 @@
-[gd_scene load_steps=6 format=4 uid="uid://if2fdlv6m5j8"]
+[gd_scene load_steps=4 format=4 uid="uid://if2fdlv6m5j8"]
 
-[ext_resource type="PackedScene" uid="uid://hntblhpukc14" path="res://scenes/UI/ui.tscn" id="1_xssof"]
 [ext_resource type="PackedScene" uid="uid://1gjpide404st" path="res://scenes/characters/frog.tscn" id="2_5m030"]
 [ext_resource type="TileSet" uid="uid://bicbaevjp1jox" path="res://assets/tileset/world1.tres" id="2_yip3l"]
 [ext_resource type="PackedScene" uid="uid://33aolm7rxplv" path="res://scenes/camera/camera_zone_2d.tscn" id="3_lxiko"]
-[ext_resource type="Script" path="res://scripts/global/gameManager.gd" id="5_dpgsj"]
 
 [node name="world" type="Node2D"]
-
-[node name="UI" parent="." instance=ExtResource("1_xssof")]
 
 [node name="frog" parent="." instance=ExtResource("2_5m030")]
 position = Vector2(376, -920)
@@ -42,10 +38,3 @@ position = Vector2(608, -1174)
 
 [node name="zone6" parent="CameraZones" instance=ExtResource("3_lxiko")]
 position = Vector2(608, -1548)
-
-[node name="game_manager" type="Node" parent="."]
-script = ExtResource("5_dpgsj")
-
-[node name="session_time_timer" type="Timer" parent="game_manager"]
-
-[connection signal="timeout" from="game_manager/session_time_timer" to="game_manager" method="_on_session_time_timer_timeout"]
