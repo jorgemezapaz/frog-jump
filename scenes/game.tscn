@@ -10,4 +10,4 @@
 
 [node name="UI" parent="." instance=ExtResource("2_7n51r")]
 
-[node name="game_manager" parent="." instance=ExtResource("3_bhlq3")]
+[node name="GameManager" parent="." instance=ExtResource("3_bhlq3")]

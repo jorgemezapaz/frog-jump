@@ -1,13 +1,17 @@
 [gd_scene load_steps=4 format=4 uid="uid://if2fdlv6m5j8"]
 
-[ext_resource type="PackedScene" uid="uid://1gjpide404st" path="res://scenes/characters/frog.tscn" id="2_5m030"]
+[ext_resource type="PackedScene" uid="uid://1gjpide404st" path="res://scenes/characters/player.tscn" id="2_5m030"]
 [ext_resource type="TileSet" uid="uid://bicbaevjp1jox" path="res://assets/tileset/world1.tres" id="2_yip3l"]
 [ext_resource type="PackedScene" uid="uid://33aolm7rxplv" path="res://scenes/camera/camera_zone_2d.tscn" id="3_lxiko"]
 
 [node name="world" type="Node2D"]
 
-[node name="frog" parent="." instance=ExtResource("2_5m030")]
+[node name="player" parent="." instance=ExtResource("2_5m030")]
 position = Vector2(376, -920)
+wall_bounce_force = 200.0
+slide_force = 200.0
+max_slide_speed = 300.0
+wall_friction = 0.8
 
 [node name="env" type="Node" parent="."]
 
